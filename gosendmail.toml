@@ -1,3 +1,4 @@
+[config]
 # gosendmail config
 
 # set logfile to blank if you just want stderr output
