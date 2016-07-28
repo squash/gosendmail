@@ -81,7 +81,11 @@ func main() {
 	if len(recip) == 0 {
 		// We only need to parse the message to get a recipient if none where
 		// provided on the command line.
-		recip = append(recip, msg.Header.Get("To"))
+		tmp,err:=mail.ParseAddress(msg.Header.Get("To"))
+		if err != nil {
+			Log.Fatal("No recipient specified")
+		}
+		recip = append(recip, tmp.String())
 	}
 
 	Log.Println("Starting: From ", fromaddr, " To ", recip)
