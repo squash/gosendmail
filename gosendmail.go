@@ -67,7 +67,6 @@ func main() {
 	// allow recipient to be passed as an argument
 	recip = pflag.Args()
 
-	Log.Println("Starting: From ", fromaddr, " To ", recip)
 
 	body, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
@@ -85,9 +84,12 @@ func main() {
 		recip = append(recip, msg.Header.Get("To"))
 	}
 
+	Log.Println("Starting: From ", fromaddr, " To ", recip)
+
 	err = smtp.SendMail(smtpaddr, nil, fromaddr, recip, body)
 	if err != nil {
-		log.Fatal("Error sending mail: ", err)
+		Log.Fatal("Error sending mail: ", err)
 	}
+	Log.Println("No errors.")
 
 }
