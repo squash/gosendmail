@@ -27,14 +27,17 @@ func main() {
 	}
 
 	fromaddr := username + "@" + host
-	viper.SetDefault("fromaddr", fromaddr)
-	viper.SetDefault("smtpaddr", "localhost:25")
-	viper.SetDefault("logfile", "")
+	viper.SetDefault("config.fromaddr", fromaddr)
+	viper.SetDefault("config.smtpaddr", "localhost:25")
+	viper.SetDefault("config.logfile", "")
 	viper.SetConfigName("gosendmail")
 	viper.AddConfigPath("/etc")
-	viper.ReadInConfig()
+	err=viper.ReadInConfig()
+	if err != nil {
+			log.Fatal("Config file not found.")
+	}
 	var Log *log.Logger
-	logfile:=viper.GetString("logfile")
+	logfile:=viper.GetString("config.logfile")
 	if logfile != "" {
 		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -52,8 +55,8 @@ func main() {
 	
 	var recip []string
 
-    smtpaddr:=viper.GetString("smtpaddr")
-    fromaddr=viper.GetString("fromaddr")
+    smtpaddr:=viper.GetString("config.smtpaddr")
+    fromaddr=viper.GetString("config.fromaddr")
 	// override defaults from cli flags
 	pflag.StringVar(&smtpaddr, "smtp-addr", smtpaddr, "SMTP server address")
 	pflag.StringVarP(&fromaddr, "from", "f", fromaddr, "SMTP sender")
