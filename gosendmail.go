@@ -84,17 +84,18 @@ func main() {
 		if err != nil {
 			Log.Fatal("No recipient specified")
 		}
-		recip = append(recip, tmp.String())
+		recip = append(recip, tmp.Address)
 	} else {
-		tmp, err := mail.ParseAddress(recip[0])
-		if err != nil {
-			Log.Fatal("Invalid recipient specified")
+		for i, _ := range recip {
+
+			tmp, err := mail.ParseAddress(recip[i])
+			if err != nil {
+				Log.Fatal("Invalid recipient specified")
+			}
+			recip[i] = tmp.Address
 		}
-		recip[0] = tmp.String()
-
 	}
-
-	Log.Println("Starting: From ", fromaddr, " To ", recip)
+	Log.Println("Ready to send email from ", fromaddr, " to ", recip)
 
 	err = smtp.SendMail(smtpaddr, nil, fromaddr, recip, body)
 	if err != nil {
