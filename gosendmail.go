@@ -95,6 +95,18 @@ func main() {
 			recip[i] = tmp.Address
 		}
 	}
+
+	// Allow message headers to override default sender
+
+	sender := msg.Header.Get("From")
+	if sender != "" {
+		tmp, err := mail.ParseAddress(sender)
+		if err != nil {
+			Log.Println("From header found in message but unable to parse. Using default.")
+		} else {
+			fromaddr = tmp.Address
+		}
+	}
 	Log.Println("Ready to send email from ", fromaddr, " to ", recip)
 
 	err = smtp.SendMail(smtpaddr, nil, fromaddr, recip, body)
