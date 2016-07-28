@@ -86,11 +86,11 @@ func main() {
 		}
 		recip = append(recip, tmp.String())
 	} else {
-		tmp, err := mail.ParseAddress(recip)
+		tmp, err := mail.ParseAddress(recip[0])
 		if err != nil {
 			Log.Fatal("Invalid recipient specified")
 		}
-		recip = append(recip, tmp.String())
+		recip[0] = tmp.String()
 
 	}
 
