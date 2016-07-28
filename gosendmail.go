@@ -2,14 +2,14 @@ package main
 
 import (
 	"bytes"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/mail"
 	"net/smtp"
 	"os"
 	"os/user"
-	"github.com/spf13/viper"
-	"github.com/spf13/pflag"
 )
 
 // Go runs the MailHog sendmail replacement.
@@ -32,31 +32,31 @@ func main() {
 	viper.SetDefault("config.logfile", "")
 	viper.SetConfigName("gosendmail")
 	viper.AddConfigPath("/etc")
-	err=viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	if err != nil {
-			log.Fatal("Config file not found.")
+		log.Fatal("Config file not found.")
 	}
 	var Log *log.Logger
-	logfile:=viper.GetString("config.logfile")
+	logfile := viper.GetString("config.logfile")
 	if logfile != "" {
 		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-		    log.Fatalln("Failed to open log file:", err)
-		}		
+			log.Fatalln("Failed to open log file:", err)
+		}
 
 		Log = log.New(file,
-		    "Info: ",
-		    log.Ldate|log.Ltime|log.Lshortfile)
+			"Info: ",
+			log.Ldate|log.Ltime|log.Lshortfile)
 
 	} else {
-			Log=log.New(os.Stderr, "Info:", log.Ldate|log.Ltime|log.Lshortfile)
-			
+		Log = log.New(os.Stderr, "Info:", log.Ldate|log.Ltime|log.Lshortfile)
+
 	}
-	
+
 	var recip []string
 
-    smtpaddr:=viper.GetString("config.smtpaddr")
-    fromaddr=viper.GetString("config.fromaddr")
+	smtpaddr := viper.GetString("config.smtpaddr")
+	fromaddr = viper.GetString("config.fromaddr")
 	// override defaults from cli flags
 	pflag.StringVar(&smtpaddr, "smtp-addr", smtpaddr, "SMTP server address")
 	pflag.StringVarP(&fromaddr, "from", "f", fromaddr, "SMTP sender")
@@ -67,10 +67,9 @@ func main() {
 	// allow recipient to be passed as an argument
 	recip = pflag.Args()
 
-
 	body, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
-		Log.Fatal( "error reading stdin")
+		Log.Fatal("error reading stdin")
 	}
 
 	msg, err := mail.ReadMessage(bytes.NewReader(body))
@@ -81,11 +80,18 @@ func main() {
 	if len(recip) == 0 {
 		// We only need to parse the message to get a recipient if none where
 		// provided on the command line.
-		tmp,err:=mail.ParseAddress(msg.Header.Get("To"))
+		tmp, err := mail.ParseAddress(msg.Header.Get("To"))
 		if err != nil {
 			Log.Fatal("No recipient specified")
 		}
 		recip = append(recip, tmp.String())
+	} else {
+		tmp, err := mail.ParseAddress(recip)
+		if err != nil {
+			Log.Fatal("Invalid recipient specified")
+		}
+		recip = append(recip, tmp.String())
+
 	}
 
 	Log.Println("Starting: From ", fromaddr, " To ", recip)
