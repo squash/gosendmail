@@ -2,14 +2,15 @@ package main
 
 import (
 	"bytes"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"net/mail"
 	"net/smtp"
 	"os"
 	"os/user"
+
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 // Go runs the MailHog sendmail replacement.
@@ -34,7 +35,7 @@ func main() {
 	viper.AddConfigPath("/etc")
 	err = viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("Config file not found.")
+		log.Fatal("Error reading config file: " + err.Error())
 	}
 	var Log *log.Logger
 	logfile := viper.GetString("config.logfile")
@@ -74,7 +75,7 @@ func main() {
 
 	msg, err := mail.ReadMessage(bytes.NewReader(body))
 	if err != nil {
-		Log.Fatal("error parsing message body")
+		Log.Fatal("error parsing message body: " + err.Error())
 	}
 
 	if len(recip) == 0 {
@@ -82,7 +83,7 @@ func main() {
 		// provided on the command line.
 		tmp, err := mail.ParseAddress(msg.Header.Get("To"))
 		if err != nil {
-			Log.Fatal("No recipient specified")
+			Log.Fatal("Recipient missing or invalid: " + err.Error())
 		}
 		recip = append(recip, tmp.Address)
 	} else {
@@ -90,7 +91,7 @@ func main() {
 
 			tmp, err := mail.ParseAddress(recip[i])
 			if err != nil {
-				Log.Fatal("Invalid recipient specified")
+				Log.Fatal("Invalid recipient specified: " + err.Error())
 			}
 			recip[i] = tmp.Address
 		}

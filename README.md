@@ -21,25 +21,25 @@ gosendmail looks for default options in /etc/gosendmail.conf. An example is prov
 You can override the from address (for SMTP `MAIL FROM`):
 
 ```bash
-./gosendmail --from="admin@mailhog.local" test@mailhog.local ...
+gosendmail --from="admin@mailhog.local" test@mailhog.local ...
 ```
 
 Or pass in multiple recipients:
 
 ```bash
-./gosendmail --from="admin@ocal" test@mailhog.local test2@mailhog.local ...
+gosendmail --from="admin@ocal" test@mailhog.local test2@mailhog.local ...
 ```
 
 Or override the destination SMTP server:
 
 ```bash
-./gosendmail --smtp-addr="localhost:1026" test@local ...
+gosendmail --smtp-addr="localhost:1026" test@local ...
 ```
 
 To use from php.ini
 
 ```
-sendmail_path = /usr/local/bin/gosendmail
+sendmail_path = "/usr/local/bin/gosendmail"
 ```
 
 ### Licence
