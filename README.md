@@ -16,7 +16,7 @@ Some content!
 EOF
 ```
 
-gosendmail looks for default options in /etc/gosendmail.conf. An example is provided.
+gosendmail looks for default options in /etc/gosendmail.toml. An example is provided.
 
 You can override the from address (for SMTP `MAIL FROM`):
 
@@ -45,6 +45,6 @@ sendmail_path = "/usr/local/bin/gosendmail"
 ### Licence
 
 Original Copyright ©‎ 2015 - 2016, Ian Kent (http://iankent.uk)
-(c) 2016 Josh Grebe (https://github.com/squash/)
+(c) 2020 Josh Grebe (https://github.com/squash/)
 
 Released under MIT license, see [LICENSE](LICENSE.md) for details.
