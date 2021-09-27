@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/mail"
@@ -49,10 +50,8 @@ func main() {
 		Log = log.New(file,
 			"Info: ",
 			log.Ldate|log.Ltime|log.Lshortfile)
-
 	} else {
 		Log = log.New(os.Stderr, "Info:", log.Ldate|log.Ltime|log.Lshortfile)
-
 	}
 
 	var recip []string
@@ -82,12 +81,16 @@ func main() {
 	if len(recip) == 0 {
 		// We only need to parse the message to get a recipient if none where
 		// provided on the command line.
-		addresses := strings.Split(",", msg.Header.Get("To"))
-		for _, a := range addresses {
-			tmp, err := mail.ParseAddress(strings.Replace(a, " ", "", -1))
-
+		addresslist:=msg.Header.Get("To")
+		addresses := strings.Split(addresslist, ",")
+		for _, address := range addresses {
+			if (!strings.HasPrefix(address, "<")) {
+				address=fmt.Sprintf("<%s>", address)
+			}
+			address=strings.Replace(address, " ", "", -1)
+			tmp, err := mail.ParseAddress(address)
 			if err != nil {
-				Log.Fatal("Recipient missing or invalid: " + err.Error())
+				Log.Fatalf("Recipient missing or invalid: [%s]: %s", address, err.Error())
 			}
 			recip = append(recip, tmp.Address)
 		}
@@ -101,7 +104,6 @@ func main() {
 			recip[i] = tmp.Address
 		}
 	}
-
 	// Allow message headers to override default sender
 
 	sender := msg.Header.Get("From")
