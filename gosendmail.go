@@ -8,6 +8,7 @@ import (
 	"net/smtp"
 	"os"
 	"os/user"
+	"strings"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -81,11 +82,15 @@ func main() {
 	if len(recip) == 0 {
 		// We only need to parse the message to get a recipient if none where
 		// provided on the command line.
-		tmp, err := mail.ParseAddress(msg.Header.Get("To"))
-		if err != nil {
-			Log.Fatal("Recipient missing or invalid: " + err.Error())
+		addresses := strings.Split(",", msg.Header.Get("To"))
+		for _, a := range addresses {
+			tmp, err := mail.ParseAddress(strings.Replace(a, " ", "", -1))
+
+			if err != nil {
+				Log.Fatal("Recipient missing or invalid: " + err.Error())
+			}
+			recip = append(recip, tmp.Address)
 		}
-		recip = append(recip, tmp.Address)
 	} else {
 		for i, _ := range recip {
 

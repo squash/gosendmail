@@ -2,10 +2,10 @@
 # gosendmail config
 
 # set logfile to blank if you just want stderr output
-#logfile=/var/log/gosendmail.log 
+#logfile="/var/log/gosendmail.log"
 
 # smtpaddr should be the address of your smarthost in host:port form. Default is localhost:25
-#smtpaddr=localhost:25
+#smtpaddr="localhost:25"
 
 # if fromaddr is not set, it defaults to the process's user@host
-#fromaddr=no-reply@local
+#fromaddr="no-reply@local"
