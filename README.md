@@ -1,8 +1,6 @@
-gosendmail
-==========
+# gosendmail
 
 A tiny sendmail replacement for environments with smarthosts, based on [mhsendmail](https://github.com/mailhog/mhsendmail)
-
 
 ```bash
 > go get github.com/squash/gosendmail
@@ -40,6 +38,14 @@ To use from php.ini
 
 ```
 sendmail_path = "/usr/local/bin/gosendmail"
+```
+
+### For use in containers
+
+Some container bases will require you to use a statically linked binary, which you can build with:
+
+```
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-w -extldflags "-static"'
 ```
 
 ### Licence
