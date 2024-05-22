@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Go runs the MailHog sendmail replacement.
 func main() {
 
 	host, err := os.Hostname()
@@ -33,6 +32,7 @@ func main() {
 	viper.SetDefault("config.fromaddr", fromaddr)
 	viper.SetDefault("config.smtpaddr", "localhost:25")
 	viper.SetDefault("config.logfile", "")
+	viper.SetDefault("config.auth", "")
 	viper.SetConfigName("gosendmail")
 	viper.AddConfigPath("/etc")
 	err = viper.ReadInConfig()
@@ -53,7 +53,7 @@ func main() {
 	} else {
 		Log = log.New(os.Stderr, "Info:", log.Ldate|log.Ltime|log.Lshortfile)
 	}
-
+	Log.Printf("gosendmail called: %#v", os.Args)
 	var recip []string
 
 	smtpaddr := viper.GetString("config.smtpaddr")
@@ -95,7 +95,7 @@ func main() {
 			recip = append(recip, tmp.Address)
 		}
 	} else {
-		for i, _ := range recip {
+		for i := range recip {
 
 			tmp, err := mail.ParseAddress(recip[i])
 			if err != nil {
@@ -105,6 +105,17 @@ func main() {
 		}
 	}
 	// Allow message headers to override default sender
+	var a smtp.Auth
+	auth := viper.GetString("config.auth")
+	if auth != "" {
+		tmp:=strings.Split(auth, ":")
+		if len(tmp) != 2 {
+			Log.Fatal("Invalid auth string. Must be in the form user:password")
+		}
+		
+		host:=strings.Split(smtpaddr, ":")[0]
+		a=smtp.PlainAuth("",tmp[0], tmp[1], host)
+	}			
 
 	sender := msg.Header.Get("From")
 	if sender != "" {
@@ -117,7 +128,7 @@ func main() {
 	}
 	Log.Println("Ready to send email from ", fromaddr, " to ", recip)
 
-	err = smtp.SendMail(smtpaddr, nil, fromaddr, recip, body)
+	err = smtp.SendMail(smtpaddr, a, fromaddr, recip, body)
 	if err != nil {
 		Log.Fatal("Error sending mail: ", err)
 	}

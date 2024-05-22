@@ -9,3 +9,6 @@
 
 # if fromaddr is not set, it defaults to the process's user@host
 #fromaddr="no-reply@local"
+
+# use smtp PLAIN authentication if set
+#auth="user@domain.com:password"
